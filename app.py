@@ -8,7 +8,7 @@ from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecretkey'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-socketio = SocketIO(app)
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -22,6 +22,7 @@ class Chat(db.Model):
 
     def __repr__(self):
         return f"<Chat from {self.sender}>"
+
 
 
 class User(UserMixin, db.Model):
@@ -59,7 +60,7 @@ def login():
             return render_template('login.html', error=True)
 
         login_user(user)
-        return redirect(url_for('chat'))
+        return redirect(url_for('home'))
 
     return render_template('login.html', error=False)
 
@@ -80,26 +81,20 @@ def register():
 def index():
     return "You are logged in as " + current_user.username
 
-@app.route('/chat')
-@login_required
+@app.route('/chat', methods=['GET', 'POST'])
+@login_required # yalnızca oturumu açık kullanıcılar sayfayı görüntüleyebilir
 def chat():
     # sohbet mesajlarını veritabanından çekiyoruz
-    chat_history = Chat.query.order_by(Chat.timestamp.desc())
+    chat_history = Chat.query.order_by(Chat.timestamp.asc())
 
+    if request.method == 'POST':
+        message = request.form.get('message')
+        if message:
+            # mesaj veritabanına kaydediliyor
+            chat_message = Chat(sender=current_user.username, message=message)
+            db.session.add(chat_message)
+            db.session.commit()
     return render_template('chat.html', chat_history=chat_history)
-
-@socketio.on('message')
-@login_required
-def handle_message(data):
-    message = data['message']
-    # mesaj veritabanına kaydediliyor
-    chat_message = Chat(sender=current_user.username, message=message)
-    db.session.add(chat_message)
-    db.session.commit()
-
-    # mesajı tüm istemcilere iletiyoruz
-    room = data['room']
-    emit('broadcast_message', {'sender': current_user.username, 'message': message}, room=room)
 
 @app.route('/home', methods=['GET', 'POST'])
 @login_required
@@ -108,11 +103,7 @@ def home():
     if request.method == 'POST':
         selected_user_id = request.form.get('user_id')
         selected_user = User.query.filter_by(id=selected_user_id).first()
-        # Seçilen kullanıcıya özel bir sohbet odası adı oluşturun
-        room_name = f"{current_user.username}:{selected_user.username}"
-        # SocketIO olayı yoluyla istemciye oda adını ve hedef kullanıcının adını gönderin
-        emit('join_room', {'room': room_name, 'target_user': selected_user.username})
-        return redirect(url_for('chat', room=room_name))
+        return redirect(url_for('chat', recipient=selected_user.username))
     return render_template('home.html', users=users)
 
 @app.route('/logout', methods=['GET', 'POST'])
@@ -124,5 +115,5 @@ def logout():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    socketio.run(app, debug=True)
+    app.run(debug=True)
 
