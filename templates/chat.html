@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chat</title>
+  </head>
+  <body>
+    <h1>Chat</h1>
+    <div id="chat-history">
+      {% for message in chat_history %}
+        <p>{{ message.sender }}: {{ message.message }}</p>
+      {% endfor %}
+    </div>
+    <form method="post" action="{{ url_for('chat') }}">
+      <input type="text" name="message" placeholder="Type your message here...">
+      <input type="submit" value="Send">
+    </form>
+    <form method="post" action="{{ url_for('logout') }}">
+      <input type="submit" value="Logout">
+    </form>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+<!-- home.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Hoşgeldiniz, {{ current_user.username }}!</h1>
+  <br>
+  <h3>Kullanıcılar</h3>
+  <ul>
+    {% for user in users %}
+      {% if user != current_user %}
+        <li><a href="{{ url_for('chat', username=user.username) }}">{{ user.username }}</a></li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+  <br>
+  <a href="{{ url_for('logout') }}">Logout</a>
+{% endblock %}
