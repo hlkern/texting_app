@@ -1,0 +1,22 @@
+Bağlantılar
+Arduino - Raspberry Pi Bağlantısı
+
+Arduino'nun TX pini (genellikle D1) Raspberry Pi'nin RX piniyle (genellikle GPIO pin 10 veya RXD) bağlanmalıdır.
+Arduino'nun RX pini (genellikle D0) Raspberry Pi'nin TX piniyle (genellikle GPIO pin 8 veya TXD) bağlanmalıdır.
+GND pinleri ortaklanmalıdır.
+Raspberry Pi - Jetson Nano Bağlantısı
+
+Raspberry Pi'nin bir UART pini (genellikle GPIO pin 8 ve 10) Jetson Nano'nun bir UART piniyle (örneğin UART1) bağlanmalıdır.
+GND pinleri ortaklanmalıdır.
+Jetson Nano - Arduino Bağlantısı
+
+Jetson Nano'nun bir UART pini (örneğin UART1) Arduino'nun RX piniyle (genellikle D0) bağlanmalıdır.
+Jetson Nano'nun bir UART pini (örneğin UART1) Arduino'nun TX piniyle (genellikle D1) bağlanmalıdır.
+GND pinleri ortaklanmalıdır.
+Dikkat Edilmesi Gerekenler
+Bağlantıları yaparken doğru pinlere ve bağlantılara dikkat edin.
+TX pini (veri gönderme) bir cihazdan RX pini (veri alma) diğer cihaza bağlanmalıdır.
+RX pini (veri alma) bir cihazdan TX pini (veri gönderme) diğer cihaza bağlanmalıdır.
+Bağlantıları yaparken güç seviyelerini uyumlu olduğundan emin olun (Arduino 5V, Raspberry Pi ve Jetson Nano 3.3V).
+Bağlantıları yaparken herhangi bir yanlışlık yapmamak için her cihazın kendi pinout diyagramlarına ve belgelendirmesine bakın.
+Seri haberleşme sırasında uygun baud rate değerlerini kullanarak tüm cihazlar arasında haberleşme yapılmalıdır.
